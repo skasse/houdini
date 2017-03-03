@@ -1,0 +1,45 @@
+vector axis;
+matrix3 m;
+float angle;
+float turn;  // single 90 degree rotation
+float timer;
+float offset;
+float turnspeed;
+float blendwidth;
+int state;
+
+m = ident();
+turn = radians(90);
+timer = (@Time%3)/3; // 0 to 1 pulse to drive anim
+
+turnspeed = ch('turnspeed');
+blendwidth = ch('blendwidth');
+
+state =  int(trunc(floor(@Time/3%3)));
+
+
+if (state==0) {
+  axis = {1,0,0};
+  offset = @P.x;
+}
+
+if (state==1) {
+  axis = {0,1,0};
+  offset = @P.y;
+}
+
+if (state==2) {
+  axis = {0,0,1};
+  offset = @P.z;
+}
+
+
+timer = smooth(0,2,-1+(timer*turnspeed)+(offset*blendwidth));
+
+
+angle = timer * turn;
+angle = clamp(angle,0,turn);
+rotate(m, angle, axis);
+@P *= m;
+
+@timer = timer;
