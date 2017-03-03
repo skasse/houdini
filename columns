@@ -1,0 +1,37 @@
+matrix3 m = ident();
+float angle = radians(ch('angle'));
+vector axis = {0,1,0};
+float h; // height
+float d; // distance
+float t; // time
+float b; // blend region
+
+rotate(m, angle, axis);
+vector Prot = @P * m;
+
+h = Prot.x;
+h = fit(h,-7,7,0.01,0.99);
+
+b = ch('blend');
+t = @Time*ch('speed')+ch('offset');
+
+d = distance(@P,0);
+d = cos((d*0.1)+t);
+d = fit(d,-b,b,0,1);
+d = chramp('ramp',d);
+
+h = lerp(h, 1-h, d);
+h *= ch('height');
+v@scale = set(1,1, h);
+
+@d = d;
+@h = h;
+
+
+
+
+
+
+
+
+
