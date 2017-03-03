@@ -1,0 +1,20 @@
+if (@ptnum==13) {
+   @pscale=1;  // don't touch the center cube!
+} else {
+    @t = 0;
+    @t = (@Time+ch('offset'))*5;
+    @t -= @ptnum;
+    @t = @t % (@numpt*3);
+    int i = chi('index');
+    @t = clamp(@t,i,i+2);
+    @t = smooth(i,i+2,@t);
+    @t = 1-@t;
+    
+    @P += @P*@t*3;
+    @pscale = 1-@t;
+    
+    
+    vector4 startrot = eulertoquaternion(vector(rand(@ptnum)*30),0); 
+    vector4 endrot = eulertoquaternion(0,0);    
+    @orient=slerp(startrot,endrot,1-@t);
+}
