@@ -1,0 +1,101 @@
+// assign udim from material id. //
+
+int pos;
+pos = find(s@path, "material");
+s@material = s@path[pos+8:pos+11];
+i@udim = atoi(s@material)+1000;
+
+
+
+// arrays // 
+int var[] = arrayProducingFunction(); // create array
+i[]@var[] = var; // assign array to attributes
+
+
+
+// create circle //
+int ptcount = chi("point_count");
+float theta = 6.28/ptcount;
+
+for(int i = 0; i <= ptcount; i++){
+    vector pos = set(sin(theta*i),  0, cos(theta*i));
+    int pt0 = addpoint(0, pos);
+}
+
+// create spirals // make better ****
+int ptcount = chi("point_count");
+float step = chf("step");
+float theta = 6.28/step;
+
+for(int i = 0; i <= ptcount; i++){
+    vector pos = set(sin(theta*i),  theta/ptcount*i, cos(theta*i));
+    int pt0 = addpoint(0, pos);
+}
+
+// spiral outwards // HUGE SCALE
+
+float height = chf("height");
+float radius = chf("radius");
+float theta = chf("theta");
+int count = chi("count");
+
+vector pos0 = set(radius*cos(theta), height, radius*sin(theta));
+//int point0 = addpoint(0, {0, 0, 0});
+
+for(int i = 0; i <= count; i++){
+    vector pos0 = set(radius*i*cos(theta*i), height*i, radius*i*sin(theta*i));
+    int point0 = addpoint(0, pos0);
+    
+    int prim0 = addprim(0, "polyline", i, i-1);
+    int vert0 = addvertex(0, prim0, point0);
+}
+
+
+// point trails from popnet driven by curve //
+
+// grid, scatter, guide curve
+// calculate tangents to drive velocity
+// seed scatter by $FF and Cd Density
+int handle = pcopen(1, "P", @P, .3, 100);
+@Cd = pcfilter(handle, "Cd");
+
+// pop wrangle // modify/confirm input contexts
+int handle = pcopen(2, "P", @P, 2, 20);
+vector v;
+@v = -pcfilter(handle, "v");
+@mult = distance(@v,  pcfilter(handle, "P"));
+float multScale = chf("mult_scale");
+@v *= @mult*pow(multScale, 3);
+
+// OR
+int primid;
+vector primuv, v;
+
+float dist = xyzdist(2, @P, primid, primuv);
+@v = primuv(2, "v", primid, primuv); 
+ 
+// trail, add, resample for curveu to drive attributes
+
+
+
+// GENERIC INFECT //
+if(@infect == 0){
+    int spnts[] = nearpoints(1,@P,100);
+    foreach(int pt;spnts){
+        if(point(1,"infect",pt) == 1){
+          @infect = 1;
+          @Cd = 1;
+          int newmprim = addprim(0, "polyline", @ptnum, pt);
+        }
+    }
+}
+
+if(@infect == 0){
+    int spnts[] = nearpoints(0,@P,1,5);
+    foreach(int pt;spnts){
+        if(point(0,"infect",pt) == 1){
+          @infect = 1;
+          @Cd = 1;
+        }
+    }
+}
